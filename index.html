@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+    const frame = document.createElement('iframe');
+    frame.sandbox.add('allow-same-origin', 'allow-scripts');
+    frame.src = '/empty.html';
+    document.body.append(frame);
+
+    const innerDocument = new DOMParser().parseFromString(`<html>
+    <head>
+        <script src="/scripts/a.js" charset="UTF-8"><\/script>
+        <script src="/scripts/mermaid.js" charset="UTF-8"><\/script> 
+        <script src="/scripts/z.js" charset="UTF-8"><\/script>
+    </head>
+    <body class="vscode-dark">
+        text
+        text
+    </body>
+    </html>`, 'text/html');
+
+    frame.contentWindow.addEventListener('DOMContentLoaded', () => {
+        console.log(`== Writing ==`);
+        console.log(innerDocument.documentElement.outerHTML);
+
+        frame.contentDocument.open();
+        frame.contentDocument.write(`<!DOCTYPE html>\n` + innerDocument.documentElement.outerHTML);
+        frame.contentDocument.close();
+
+        setTimeout(() => {
+            console.log('== Wrote ==');
+            console.log(frame.contentDocument.documentElement.outerHTML);
+        }, 2000);
+    });
+</script>
+</body>
+
+</html>
